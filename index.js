@@ -1,4 +1,5 @@
 import express from "express";
+import dotenv from "dotenv";
 
 import userRouter from "./src/features/user/user.routes.js";
 import NotFoundError from "./src/error-handler/notfFound.js";
@@ -7,6 +8,8 @@ import logger from "./src/middlewares/logger.middleware.js";
 
 const app = express();
 app.use(express.json());
+const envFile = `.env.${process.env.NODE_ENV || "development"}`;
+dotenv.config({ path: envFile });
 
 app.use("/api/users", userRouter);
 
@@ -34,9 +37,11 @@ app.use((err, req, res, next) => {
     });
   }
 
-  return res.status(500).json({ error: "Internal Server Error", stack: err.stack });
+  return res
+    .status(500)
+    .json({ error: "Internal Server Error", stack: err.stack });
 });
 
-app.listen(3500, () => {
+app.listen(process.env.PORT, () => {
   console.log("running on port 3500");
 });
