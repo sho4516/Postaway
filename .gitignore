@@ -1,0 +1,71 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+.pnp/
+.pnp.js
+
+# Build/Production files
+dist/
+build/
+
+# Environment variables
+.env
+.env.test
+.env.production
+
+# Cache folders
+.cache/
+.nyc_output/
+coverage/
+temp/
+
+# Editor/IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Jest coverage files
+coverage/
+jest/
+
+# npm package locks
+package-lock.json
+yarn.lock
+
+# Binaries
+*.exe
+*.out
+*.app
+*.dmg
+
+# Temporary files
+*.tmp
+*.temp
+
+# PM2 Logs
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# VSCode extensions settings
+.vscode/*
+
+# Debugging files
+*.log
+
+# Security-related files
+.ssh/
