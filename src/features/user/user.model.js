@@ -1,4 +1,5 @@
 import NotFoundError from "../../error-handler/notfFound.js";
+import ValidationError from "../../error-handler/validationError.js";
 import bcrypt from "bcrypt";
 
 export default class UserModel {
@@ -26,6 +27,20 @@ export default class UserModel {
     );
     users.push(newUser);
     return newUser;
+  }
+
+  static async confirmLogin(userCreds) {
+    const email = userCreds.email;
+    const user = users.find((u) => u.email == email);
+    if (!user) {
+      throw new NotFoundError(`No user found with email ${email}`, 404);
+    }
+    const hashedPassword = user.password;
+    const match = await bcrypt.compare(userCreds.password, hashedPassword);
+    if (!match) {
+      throw new ValidationError(`Incorrect password`, 404);
+    }
+    return user;
   }
 
   static async hashPassword(password) {

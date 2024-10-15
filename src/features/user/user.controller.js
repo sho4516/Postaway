@@ -1,5 +1,6 @@
 import UserModel from "./user.model.js";
 import logger from "../../middlewares/logger.middleware.js";
+import jwt from "jsonwebtoken";
 
 export default class UserController {
   getAllUsers(req, res, next) {
@@ -39,5 +40,22 @@ export default class UserController {
       .catch((err) => {
         return next(err);
       });
+  }
+
+  async login(req, res, next) {
+    try {
+      const validUser = await UserModel.confirmLogin(req.body);
+      const jwtToken = jwt.sign(
+        {
+          userId: validUser.id,
+          email: validUser.email,
+        },
+        process.env.JWTSECRET,
+        { expiresIn: "1h" }
+      );
+      return res.status(200).json({ success: true, token: jwtToken });
+    } catch (err) {
+      next(err);
+    }
   }
 }

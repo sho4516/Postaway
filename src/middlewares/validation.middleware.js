@@ -15,29 +15,48 @@ const signupRules = [
     .withMessage("Password must contain at least one letter"),
 ];
 
-export const addUserValidationMiddleware = async (req, res, next) => {
-  await Promise.all(signupRules.map((rule) => rule.run(req)));
-  const errors = validationResult(req);
+const signInRules = [
+  body("email")
+    .notEmpty()
+    .withMessage("Email field cannot be empty")
+    .isEmail()
+    .withMessage("Enter valid email id"),
 
-  if (!errors.isEmpty()) {
-    const errorArray = errors.array();
-    const filteredErrorArray = errorArray.map((error) => {
-      if (error.path === "password") {
-        return { ...error, value: "***" }; // Mask the password value
-      }
-      return error;
-    });
-    const mappedErrorArray = filteredErrorArray
-      .map((error) => JSON.stringify(error))
-      .join(", ");
-    logger.error({
-      message: mappedErrorArray,
-      method: req.method,
-      url: req.originalUrl,
-      status: 302,
-      user: req.user ? req.user.id : "Guest",
-    });
-    return next(new ValidationError(mappedErrorArray, 302));
-  }
-  next();
+  body("password").notEmpty().withMessage("password field cannot be empty"),
+];
+
+const validateRules = (rules) => {
+  return async (req, res, next) => {
+    await Promise.all(rules.map((rule) => rule.run(req)));
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const errorArray = errors.array().map((error) => {
+        // Mask password in the error response
+        if (error.path === "password") {
+          return { ...error, value: "***" };
+        }
+        return error;
+      });
+
+      // Log the error details (excluding password values)
+      const mappedErrorArray = errorArray
+        .map((error) => JSON.stringify(error))
+        .join(", ");
+      logger.error({
+        message: mappedErrorArray,
+        method: req.method,
+        url: req.originalUrl,
+        status: 302,
+        user: req.user ? req.user.id : "Guest",
+      });
+
+      return next(new ValidationError(mappedErrorArray, 302));
+    }
+    next();
+  };
 };
+
+// Export validation middlewares using the helper function
+export const addUserValidationMiddleware = validateRules(signupRules);
+export const loginUserValidationMiddleware = validateRules(signInRules);
