@@ -51,6 +51,29 @@ export default class PostModel {
 
     posts.splice(postIndex, 1);
   }
+
+  static updatePost(postId, caption, fileName, userId) {
+    const postIndex = posts.findIndex((p) => p.id == postId);
+    if (postIndex == -1) {
+      throw new NotFoundError(`No post found with id ${postId}`, 404);
+    }
+    const post = posts.find((p) => p.id == postId);
+    if (userId != post.userId) {
+      throw new ValidationError(
+        `${email} do not authorize to update post with post id ${postId}`,
+        401
+      );
+    }
+    if (caption) {
+      posts[postIndex].caption = caption;
+    }
+
+    if (fileName) {
+      posts[postIndex].imageURL = fileName;
+    }
+
+    return posts[postIndex];
+  }
 }
 
 let posts = [new PostModel(1, 2, "My new post", "dummyUrl")];

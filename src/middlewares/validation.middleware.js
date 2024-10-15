@@ -35,6 +35,22 @@ const addPostRules = [
   }),
 ];
 
+const updatePostRules = [
+  body("caption")
+    .if((value, { req }) => req.body.caption !== undefined) // Only check if caption is provided
+    .notEmpty()
+    .withMessage("Caption must not be empty"),
+
+  body("imageURL")
+    .if((val, { req }) => req.body.imageURL !== undefined)
+    .custom((val, { req }) => {
+      if (!req.file) {
+        throw new Error("File is required");
+      }
+      return true;
+    }),
+];
+
 const validateRules = (rules) => {
   return async (req, res, next) => {
     await Promise.all(rules.map((rule) => rule.run(req)));
@@ -71,3 +87,4 @@ const validateRules = (rules) => {
 export const addUserValidationMiddleware = validateRules(signupRules);
 export const loginUserValidationMiddleware = validateRules(signInRules);
 export const addPostValidationMiddleware = validateRules(addPostRules);
+export const updatePostValidationMiddleware = validateRules(updatePostRules);

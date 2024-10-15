@@ -50,4 +50,22 @@ export default class PostController {
       message: `Post with post id ${postId} deleted successfully`,
     });
   }
+
+  updatePostById(req, res, next) {
+    try {
+      const postId = req.params.id;
+      const caption = req.body.caption;
+      const fileName = req.file ? req.file.filename : null;
+      const userId = req.userId;
+      const updatedPost = PostModel.updatePost(
+        postId,
+        caption,
+        fileName,
+        userId
+      );
+      return res.status(201).json(updatedPost);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
