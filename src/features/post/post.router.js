@@ -15,5 +15,7 @@ postRouter.post(
   postController.uploadPost
 );
 postRouter.get("/", jwtMiddleware, postController.getPostByUserId);
+postRouter.get("/:id", jwtMiddleware, postController.getPostById);
+postRouter.delete("/:id", jwtMiddleware,postController.deletePostById);
 
 export default postRouter;

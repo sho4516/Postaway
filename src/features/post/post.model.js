@@ -1,4 +1,5 @@
 import NotFoundError from "../../error-handler/notfFound.js";
+import ValidationError from "../../error-handler/validationError.js";
 
 export default class PostModel {
   constructor(_id, _userId, _caption, _imageURL) {
@@ -25,6 +26,30 @@ export default class PostModel {
     const userPosts = [...posts];
     const filteredPosts = userPosts.filter((p) => p.userId == userId);
     return filteredPosts;
+  }
+
+  static getPostByPostId(postId) {
+    const post = posts.find((p) => p.id == postId);
+    if (!post) {
+      throw new NotFoundError(`No post found with id ${postId}`, 404);
+    }
+    return post;
+  }
+
+  static deletePostById(postId, userId, email) {
+    const postIndex = posts.findIndex((p) => p.id == postId);
+    if (postIndex == -1) {
+      throw new NotFoundError(`No post found with id ${postId}`, 404);
+    }
+    const post = posts.find((p) => p.id == postId);
+    if (userId != post.userId) {
+      throw new ValidationError(
+        `${email} do not authorize to delete post with post id ${postId}`,
+        401
+      );
+    }
+
+    posts.splice(postIndex, 1);
   }
 }
 

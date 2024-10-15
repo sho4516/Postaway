@@ -33,4 +33,21 @@ export default class PostController {
       return res.status(200).json(posts);
     }
   }
+
+  getPostById(req, res, next) {
+    const postId = req.params.id;
+    const post = PostModel.getPostByPostId(postId);
+    return res.status(200).json(post);
+  }
+
+  deletePostById(req, res, next) {
+    const postId = req.params.id;
+    const userId = req.userId;
+    const email = req.email;
+    PostModel.deletePostById(postId, userId, email);
+    return res.status(200).json({
+      success: true,
+      message: `Post with post id ${postId} deleted successfully`,
+    });
+  }
 }
