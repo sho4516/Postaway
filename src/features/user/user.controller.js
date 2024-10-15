@@ -12,7 +12,7 @@ export default class UserController {
       message: "Fetching all users",
       method: req.method,
       url: req.originalUrl,
-      user: req.user ? req.user.id : "Guest", // If authentication is present
+      user: req.userId ? req.userId : "Guest", // If authentication is present
     });
 
     const users = UserModel.getAll();
@@ -24,7 +24,7 @@ export default class UserController {
       method: req.method,
       url: req.originalUrl,
       status: 200,
-      user: req.user ? req.user.id : "Guest",
+      user: req.userId ? req.userId : "Guest", // If authentication is present
       responseTime: `${Date.now() - startTime}ms`,
     });
 

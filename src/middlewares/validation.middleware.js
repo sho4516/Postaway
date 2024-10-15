@@ -25,6 +25,16 @@ const signInRules = [
   body("password").notEmpty().withMessage("password field cannot be empty"),
 ];
 
+const addPostRules = [
+  body("caption").notEmpty().withMessage("Caption is required"),
+  body("imageURL").custom((val, { req }) => {
+    if (!req.file) {
+      throw new Error("File is required");
+    }
+    return true;
+  }),
+];
+
 const validateRules = (rules) => {
   return async (req, res, next) => {
     await Promise.all(rules.map((rule) => rule.run(req)));
@@ -48,7 +58,7 @@ const validateRules = (rules) => {
         method: req.method,
         url: req.originalUrl,
         status: 302,
-        user: req.user ? req.user.id : "Guest",
+        user: req.userId ? req.userId : "Guest",
       });
 
       return next(new ValidationError(mappedErrorArray, 302));
@@ -60,3 +70,4 @@ const validateRules = (rules) => {
 // Export validation middlewares using the helper function
 export const addUserValidationMiddleware = validateRules(signupRules);
 export const loginUserValidationMiddleware = validateRules(signInRules);
+export const addPostValidationMiddleware = validateRules(addPostRules);

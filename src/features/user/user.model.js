@@ -43,6 +43,11 @@ export default class UserModel {
     return user;
   }
 
+  static getById(userId) {
+    const user = users.find((u) => u.id == userId);
+    return user;
+  }
+
   static async hashPassword(password) {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
