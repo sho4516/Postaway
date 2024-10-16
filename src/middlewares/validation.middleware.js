@@ -51,6 +51,16 @@ const updatePostRules = [
     }),
 ];
 
+const uploadCommentRules = [
+  body("content").notEmpty().withMessage("content cannot be empty"),
+];
+
+const updateCommentRules = [
+    body("content")
+    .if((val, {req})=> req.body.content != undefined)
+    .notEmpty().withMessage("content cannot be empty"),
+  ];
+
 const validateRules = (rules) => {
   return async (req, res, next) => {
     await Promise.all(rules.map((rule) => rule.run(req)));
@@ -59,7 +69,7 @@ const validateRules = (rules) => {
     if (!errors.isEmpty()) {
       const errorArray = errors.array().map((error) => {
         // Mask password in the error response
-        if (error.path === "password") {
+        if (error.path == "password") {
           return { ...error, value: "***" };
         }
         return error;
@@ -88,3 +98,6 @@ export const addUserValidationMiddleware = validateRules(signupRules);
 export const loginUserValidationMiddleware = validateRules(signInRules);
 export const addPostValidationMiddleware = validateRules(addPostRules);
 export const updatePostValidationMiddleware = validateRules(updatePostRules);
+export const addCommentValidationMiddleware = validateRules(uploadCommentRules);
+export const updateCommentValidationMiddleware = validateRules(updateCommentRules);
+

@@ -4,10 +4,13 @@ import path from "path";
 
 import userRouter from "./src/features/user/user.routes.js";
 import postRouter from "./src/features/post/post.router.js";
+import likeRouter from "./src/features/like/like.route.js";
 import NotFoundError from "./src/error-handler/notfFound.js";
 import ValidationError from "./src/error-handler/validationError.js";
 import logger from "./src/middlewares/logger.middleware.js";
 import AuthorizationError from "./src/error-handler/authorizationError.js";
+import commentRouter from "./src/features/comment/comment.router.js";
+import jwtValidator from "./src/middlewares/jwt.middleware.js";
 
 // Initialize express server
 const app = express();
@@ -24,6 +27,12 @@ app.use("/api/users", userRouter);
 
 //Post Controller
 app.use("/api/posts", postRouter);
+
+//Comment Controller
+app.use("/api/comments", jwtValidator, commentRouter);
+
+//Like Controller
+app.use("/api/likes", jwtValidator, likeRouter);
 
 // Error handler
 app.use((err, req, res, next) => {

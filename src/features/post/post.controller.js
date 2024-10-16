@@ -1,5 +1,7 @@
 import PostModel from "./post.model.js";
 import NotFoundError from "../../error-handler/notfFound.js";
+import ValidationError from "../../error-handler/validationError.js";
+import { NumberValidator } from "../../utils/utils.js";
 
 export default class PostController {
   getAllPosts(req, res, next) {
@@ -36,12 +38,22 @@ export default class PostController {
 
   getPostById(req, res, next) {
     const postId = req.params.id;
+    try {
+      NumberValidator(postId);
+    } catch (err) {
+      next(err);
+    }
     const post = PostModel.getPostByPostId(postId);
     return res.status(200).json(post);
   }
 
   deletePostById(req, res, next) {
     const postId = req.params.id;
+    try {
+      NumberValidator(postId);
+    } catch (err) {
+      next(err);
+    }
     const userId = req.userId;
     const email = req.email;
     PostModel.deletePostById(postId, userId, email);
@@ -54,6 +66,7 @@ export default class PostController {
   updatePostById(req, res, next) {
     try {
       const postId = req.params.id;
+      NumberValidator(postId);
       const caption = req.body.caption;
       const fileName = req.file ? req.file.filename : null;
       const userId = req.userId;
