@@ -51,7 +51,7 @@ export default class UserController {
           email: validUser.email,
         },
         process.env.JWTSECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "8h" }
       );
       return res.status(200).json({ success: true, token: jwtToken });
     } catch (err) {

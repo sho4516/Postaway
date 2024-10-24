@@ -1,12 +1,18 @@
 import PostModel from "./post.model.js";
 import NotFoundError from "../../error-handler/notfFound.js";
-import ValidationError from "../../error-handler/validationError.js";
 import { NumberValidator } from "../../utils/utils.js";
 
 export default class PostController {
   getAllPosts(req, res, next) {
+    const captionFilter = req.query.caption;
     const posts = PostModel.getAll();
-    return res.status(200).json(posts);
+
+    const filteredPosts = captionFilter
+      ? posts.filter((post) =>
+          post.caption.toLowerCase().includes(captionFilter.toLowerCase())
+        )
+      : posts;
+    return res.status(200).json(filteredPosts);
   }
 
   uploadPost(req, res, next) {
