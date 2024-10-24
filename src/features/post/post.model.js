@@ -1,15 +1,17 @@
 import NotFoundError from "../../error-handler/notfFound.js";
 import ValidationError from "../../error-handler/validationError.js";
 import logger from "../../middlewares/logger.middleware.js";
+import UserModel from "../user/user.model.js";
 
 export default class PostModel {
-  constructor(_id, _userId, _caption, _imageURL, _comments, _likes) {
+  constructor(_id, _userId, _caption, _imageURL, _comments, _likes, _status) {
     this.id = _id;
     this.userId = _userId;
     this.caption = _caption;
     this.imageURL = _imageURL;
     this.comments = _comments;
     this.likes = _likes;
+    this.status = _status;
   }
 
   static getAll() {
@@ -19,14 +21,15 @@ export default class PostModel {
     return posts;
   }
 
-  static createPost(caption, fileName, userId) {
+  static createPost(caption, fileName, userId, status = "published") {
     const newPost = new PostModel(
       posts.length + 1,
       userId,
       caption,
       fileName,
       0,
-      0
+      0,
+      status
     );
     posts.push(newPost);
     return newPost;
@@ -96,7 +99,7 @@ export default class PostModel {
     return posts[postIndex];
   }
 
-  static incrementPostLike(postId){
+  static incrementPostLike(postId) {
     const postIndex = this._findPostIndex(postId);
     posts[postIndex].likes += 1;
     return posts[postIndex];
@@ -112,6 +115,39 @@ export default class PostModel {
     }
 
     posts[postIndex].likes -= 1;
+    return posts[postIndex];
+  }
+
+  static getPostByStatus(userId, status) {
+    const user = UserModel.getById(userId);
+    if (!user) {
+      throw new NotFoundError("User not found", 404);
+    }
+
+    const filteredPosts = posts.filter(
+      (p) => p.userId == userId && p.status == status
+    );
+
+    return filteredPosts;
+  }
+
+  static changePostStatus(userId, postId, status) {
+    const user = UserModel.getById(userId);
+    if (!user) {
+      throw new NotFoundError("User not found", 404);
+    }
+
+    const postIndex = this._findPostIndex(postId);
+    const post = posts[postIndex];
+
+    if (userId != post.userId) {
+      throw new ValidationError(
+        `User is not authorized to change status of post with id ${postId}`,
+        401
+      );
+    }
+
+    posts[postIndex].status = status;
     return posts[postIndex];
   }
 
