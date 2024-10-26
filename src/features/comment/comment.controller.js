@@ -12,8 +12,23 @@ export default class CommentController {
     } catch (err) {
       next(err);
     }
+
+    // Pagination parameters with default values
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const comments = CommentModel.getCommentsByPostId(postId);
-    return res.status(200).json(comments);
+
+    // Paginating the comments
+    const paginatedComments = comments.slice(skip, skip + limit);
+
+    return res.status(200).json({
+      page,
+      totalComments: comments.length,
+      totalPages: Math.ceil(comments.length / limit),
+      comments: paginatedComments,
+    });
   }
 
   uploadComment(req, res, next) {
