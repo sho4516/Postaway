@@ -2,6 +2,7 @@ import PostModel from "./post.model.js";
 import NotFoundError from "../../error-handler/notfFound.js";
 import { NumberValidator } from "../../utils/utils.js";
 import ValidationError from "../../error-handler/validationError.js";
+import BookmarkModel from "../bookmark/bookmark.model.js";
 
 export default class PostController {
   getAllPosts(req, res, next) {
@@ -191,5 +192,47 @@ export default class PostController {
     } catch (err) {
       next(err);
     }
+  }
+
+  addBookmark(req, res, next) {
+    const userId = req.userId;
+    const postId = req.params.id;
+
+    const bookmark = BookmarkModel.addBookmark(userId, postId);
+    if (!bookmark) {
+      return res.status(409).json({ message: "Post already bookmarked" });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "post bookmarked successfully",
+      bookmark,
+    });
+  }
+
+  removeBookmark(req, res, next) {
+    const userId = req.userId;
+    const postId = req.params.id;
+
+    const removeBookmark = BookmarkModel.removeBookmark(userId, postId);
+    if (!removeBookmark) {
+      return res.status(404).json({ message: "Bookmark not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Bookmark removed successfully",
+    });
+  }
+
+  getBookmarks(req, res, next) {
+    const userId = req.userId;
+
+    const bookmarks = BookmarkModel.getBookmarks(userId);
+    const posts = bookmarks.map((b) => {
+      return PostModel.getPostByPostId(b.postId);
+    });
+
+    return res.status(200).json(posts);
   }
 }
