@@ -4,7 +4,16 @@ import logger from "../../middlewares/logger.middleware.js";
 import UserModel from "../user/user.model.js";
 
 export default class PostModel {
-  constructor(_id, _userId, _caption, _imageURL, _comments, _likes, _status) {
+  constructor(
+    _id,
+    _userId,
+    _caption,
+    _imageURL,
+    _comments,
+    _likes,
+    _status,
+    _createdAt
+  ) {
     this.id = _id;
     this.userId = _userId;
     this.caption = _caption;
@@ -12,6 +21,7 @@ export default class PostModel {
     this.comments = _comments;
     this.likes = _likes;
     this.status = _status;
+    this.createdAt = _createdAt;
   }
 
   static getAll() {
@@ -29,8 +39,10 @@ export default class PostModel {
       fileName,
       0,
       0,
-      status
+      status,
+      Date.now()
     );
+    console.log(newPost.createdAt);
     posts.push(newPost);
     return newPost;
   }
@@ -160,4 +172,4 @@ export default class PostModel {
   }
 }
 
-let posts = [new PostModel(1, 2, "My new post", "dummyUrl", 0, 0)];
+let posts = [];

@@ -7,12 +7,33 @@ export default class PostController {
   getAllPosts(req, res, next) {
     const captionFilter = req.query.caption;
     const posts = PostModel.getAll();
+    const sortCriteria = req.query.sortCriteria
+      ? req.query.sortCriteria
+      : "date";
+    const sortOrder = req.query.order === "asc" ? 1 : -1;
 
     const filteredPosts = captionFilter
       ? posts.filter((post) =>
           post.caption.toLowerCase().includes(captionFilter.toLowerCase())
         )
       : posts;
+
+    console.log(sortOrder, sortCriteria);
+
+    if (sortCriteria == "engagement") {
+      filteredPosts.sort((a, b) => {
+        const aEngagement = a.comments + a.likes;
+        const bEngagement = b.comments + b.likes;
+        return sortOrder * (bEngagement - aEngagement);
+      });
+    } else if (sortCriteria == "date") {
+      filteredPosts.sort((a, b) => {
+        const aDate = new Date(a.createdAt);
+        const bDate = new Date(b.createdAt);
+        return sortOrder * (aDate - bDate);
+      });
+    }
+
     return res.status(200).json(filteredPosts);
   }
 
