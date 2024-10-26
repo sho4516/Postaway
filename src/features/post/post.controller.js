@@ -13,6 +13,11 @@ export default class PostController {
       : "date";
     const sortOrder = req.query.order === "asc" ? 1 : -1;
 
+    // Default pagination values if not provided
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const filteredPosts = captionFilter
       ? posts.filter((post) =>
           post.caption.toLowerCase().includes(captionFilter.toLowerCase())
@@ -35,7 +40,16 @@ export default class PostController {
       });
     }
 
-    return res.status(200).json(filteredPosts);
+    // Apply pagination
+    const paginatedPosts = filteredPosts.slice(skip, skip + limit);
+
+    // Send paginated response
+    return res.status(200).json({
+      page,
+      totalPosts: filteredPosts.length,
+      totalPages: Math.ceil(filteredPosts.length / limit),
+      posts: paginatedPosts,
+    });
   }
 
   uploadPost(req, res, next) {
