@@ -1,3 +1,4 @@
+import AuthorizationError from "../../error-handler/authorizationError.js";
 import NotFoundError from "../../error-handler/notfFound.js";
 import ValidationError from "../../error-handler/validationError.js";
 import logger from "../../middlewares/logger.middleware.js";
@@ -42,7 +43,6 @@ export default class PostModel {
       status,
       Date.now()
     );
-    console.log(newPost.createdAt);
     posts.push(newPost);
     return newPost;
   }
@@ -153,7 +153,7 @@ export default class PostModel {
     const post = posts[postIndex];
 
     if (userId != post.userId) {
-      throw new ValidationError(
+      throw new AuthorizationError(
         `User is not authorized to change status of post with id ${postId}`,
         401
       );

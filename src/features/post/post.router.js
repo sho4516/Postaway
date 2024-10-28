@@ -13,7 +13,7 @@ postRouter.get("/all", jwtMiddleware, postController.getAllPosts);
 postRouter.get("/", jwtMiddleware, postController.getPostByUserId);
 postRouter.get("/drafts", jwtMiddleware, postController.getDrafts);
 postRouter.get("/archives", jwtMiddleware, postController.getArchived);
-postRouter.get("/bookmarks", jwtMiddleware, postController.getBookmarks);
+postRouter.get("/bookmark", jwtMiddleware, postController.getBookmarks);
 postRouter.get("/:id", jwtMiddleware, postController.getPostById);
 
 postRouter.post(
@@ -31,7 +31,7 @@ postRouter.post(
 );
 postRouter.post("/archive/:id", jwtMiddleware, postController.archivePost);
 postRouter.post("/publish/:id", jwtMiddleware, postController.publishPost);
-postRouter.post("/addBookmark/:id", jwtMiddleware, postController.addBookmark);
+postRouter.post("/bookmark/:id", jwtMiddleware, postController.addBookmark);
 
 postRouter.put(
   "/:id",
@@ -43,7 +43,7 @@ postRouter.put(
 
 postRouter.delete("/:id", jwtMiddleware, postController.deletePostById);
 postRouter.delete(
-  "/removeBookmark/:id",
+  "/bookmark/:id",
   jwtMiddleware,
   postController.removeBookmark
 );

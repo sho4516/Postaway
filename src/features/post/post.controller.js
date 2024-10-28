@@ -70,13 +70,7 @@ export default class PostController {
       return next(new NotFoundError(`No user found`, 404));
     }
     const posts = PostModel.getPostByUserId(userId);
-    if (posts.length == 0) {
-      return res
-        .status(404)
-        .json({ message: `No posts found for ${req.email}` });
-    } else {
-      return res.status(200).json(posts);
-    }
+    return res.status(200).json(posts);
   }
 
   getPostById(req, res, next) {
@@ -184,8 +178,17 @@ export default class PostController {
         "published"
       );
       if (!publishedPost.caption || !publishedPost.imageURL) {
+        const mappedErrorArray = [
+          {
+            type: "field",
+            value: "caption/image",
+            msg: "post is invalid: caption/image missing",
+            path: "",
+            location: "",
+          },
+        ];
         return next(
-          new ValidationError("post is invalid: caption/image missing", 301)
+          new ValidationError(mappedErrorArray, 422)
         );
       }
       return res.status(201).json({

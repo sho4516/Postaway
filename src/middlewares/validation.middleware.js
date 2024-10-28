@@ -56,10 +56,11 @@ const uploadCommentRules = [
 ];
 
 const updateCommentRules = [
-    body("content")
-    .if((val, {req})=> req.body.content != undefined)
-    .notEmpty().withMessage("content cannot be empty"),
-  ];
+  body("content")
+    .if((val, { req }) => req.body.content != undefined)
+    .notEmpty()
+    .withMessage("content cannot be empty"),
+];
 
 const validateRules = (rules) => {
   return async (req, res, next) => {
@@ -76,16 +77,20 @@ const validateRules = (rules) => {
       });
 
       // Log the error details (excluding password values)
-      const mappedErrorArray = errorArray
-        .map((error) => JSON.stringify(error))
-        .join(", ");
-      logger.error({
-        message: mappedErrorArray,
-        method: req.method,
-        url: req.originalUrl,
-        status: 302,
-        user: req.userId ? req.userId : "Guest",
-      });
+      const mappedErrorArray = errorArray.map((error) => ({
+        type: error.type,
+        value: error.value,
+        msg: error.msg,
+        path: error.path,
+        location: error.location,
+      }));
+      //   logger.error({
+      //     message: mappedErrorArray,
+      //     method: req.method,
+      //     url: req.originalUrl,
+      //     status: 302,
+      //     user: req.userId ? req.userId : "Guest",
+      //   });
 
       return next(new ValidationError(mappedErrorArray, 302));
     }
@@ -99,5 +104,5 @@ export const loginUserValidationMiddleware = validateRules(signInRules);
 export const addPostValidationMiddleware = validateRules(addPostRules);
 export const updatePostValidationMiddleware = validateRules(updatePostRules);
 export const addCommentValidationMiddleware = validateRules(uploadCommentRules);
-export const updateCommentValidationMiddleware = validateRules(updateCommentRules);
-
+export const updateCommentValidationMiddleware =
+  validateRules(updateCommentRules);

@@ -11,6 +11,8 @@ import logger from "./src/middlewares/logger.middleware.js";
 import AuthorizationError from "./src/error-handler/authorizationError.js";
 import commentRouter from "./src/features/comment/comment.router.js";
 import jwtValidator from "./src/middlewares/jwt.middleware.js";
+import swagger from "swagger-ui-express";
+import apiDocs from "./swagger.json" assert { type: "json" };
 
 // Initialize express server
 const app = express();
@@ -21,6 +23,9 @@ app.use(express.static(path.join(path.resolve(), "public", "images")));
 // Configure the dotenv
 const envFile = `.env.${process.env.NODE_ENV || "development"}`;
 dotenv.config({ path: envFile });
+
+//Swagger
+app.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
 
 // User Controller
 app.use("/api/users", userRouter);
@@ -53,7 +58,7 @@ app.use((err, req, res, next) => {
 
   if (err instanceof ValidationError) {
     return res.status(err.statusCode).json({
-      error: err.message,
+      error: err.errors,
       name: err.name,
       stack: err.stack,
     });

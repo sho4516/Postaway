@@ -56,6 +56,6 @@ export default class UserModel {
 }
 
 const users = [
-  new UserModel(1, "shobhit", "shobhitgoyalg@gmail.com", "Ast@194400"),
-  new UserModel(2, "Aayush", "Ayush@gmail.com", "12345"),
+  // new UserModel(1, "shobhit", "shobhitgoyalg@gmail.com", "Ast@194400"),
+  // new UserModel(2, "Aayush", "Ayush@gmail.com", "12345"),
 ];

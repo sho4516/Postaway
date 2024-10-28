@@ -1,0 +1,1580 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Postaway",
+    "description": "Postaway - Social media app",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3500",
+  "securityDefinitions": {
+    "JWT": {
+      "in": "header",
+      "name": "authorization",
+      "type": "apiKey"
+    }
+  },
+  "paths": {
+    "/api/users/signup": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Register",
+        "description": "User Registration endpoint",
+        "produces": "application/json",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "required": true,
+            "description": "User registration details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "Shobhitgoyalg@gmail.com"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "shobhit"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "qwer1234"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A User Object",
+            "schema": {
+              "$ref": "#/definitions/Resource"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "302": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/users/signin": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "User Login",
+        "description": "User login via email and password",
+        "produces": "application/json",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "type": "object",
+            "required": "true",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "Shobhitgoyalg@gmail.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "qwer1234"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token Object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImVtYWlsIjoiQWF5dXNoQGdtYWlsLmNvbSIsImlhdCI6MTcyOTkyNzI2MSwiZXhwIjoxNzI5OTU2MDYxfQ.z4Nxd0s0cSimQFSravr-pVaWMWA3amqVq9ipfzXoF50"
+                }
+              }
+            }
+          },
+          "301": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get Users",
+        "description": "Get all users in the DB",
+        "produces": "application/json",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Array of user objects",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Shobhit"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "Shobhitgoyalg@gmail.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "$2b$10$Sx/MgXR0f00c0aOFbWLZce4NrajZM3XMWd8g9.rBg97f57toRL0xu"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/all": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Get Posts",
+        "description": "Get all posts saved in DB",
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "produces": "application/json",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "caption",
+            "required": false,
+            "description": "Filter posts by caption",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "sortCriteria",
+            "required": false,
+            "description": "Specify the sortCriteria and date/engagement",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "description": "Specify the sort order and asc/desc",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "description": "Specify the page number",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Specify the number of posts in one page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All Posts",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "page": {
+                  "type": "integer"
+                },
+                "totalPosts": {
+                  "type": "integer"
+                },
+                "totalPages": {
+                  "type": "integer"
+                },
+                "posts": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Post"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Get Posts by User Id",
+        "description": "Returns all the posts, uploaded by the current logged in user",
+        "produces": "application/json",
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "An array containing post objects",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Post"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Upload a post",
+        "description": "Uploads a post(caption and image) onto the server",
+        "security": [{ "JWT": {} }],
+        "produces": "application/json",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "caption",
+            "requied": true,
+            "type": "string",
+            "description": "Caption of the post that needs to be uploaded",
+            "example": "My new Post"
+          },
+          {
+            "in": "formData",
+            "name": "imageURL",
+            "type": "file",
+            "required": true,
+            "description": "The file to upload"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created Post Object",
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          },
+          "302": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Get Posts by Post Id",
+        "description": "Retrieve a particular post by it's id",
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "produces": "application/json",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the post to retrieve",
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post Object",
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Posts"],
+        "summary": "Delete a post",
+        "description": "Delete a post by it's id",
+        "security": [{ "JWT": {} }],
+        "produces": "application/json",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Id of the post that needs to be deleted",
+            "type": "integer",
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Object containing success message",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Post with post id {id} deleted successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Posts"],
+        "summary": "Update a post by id",
+        "description": "Update a post by postId, provided in the path",
+        "security": [{ "JWT": {} }],
+        "produces": "application/json",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "requied": true,
+            "type": "integer",
+            "description": "Id of the post that needs to be updated",
+            "exapmle": "2"
+          },
+          {
+            "in": "formData",
+            "name": "caption",
+            "requied": false,
+            "type": "string",
+            "description": "Caption of the post that needs to be uploaded",
+            "exapmle": "My new Post"
+          },
+          {
+            "in": "formData",
+            "name": "imageURL",
+            "type": "file",
+            "required": false,
+            "description": "The file to upload"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Updated post object",
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/draft": {
+      "post": {
+        "tags": ["Drafts"],
+        "summary": "Save Post as draft",
+        "description": "Save the current post as draft",
+        "produces": "application/json",
+        "consumes": ["multipart/form-data"],
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "caption",
+            "type": "string",
+            "required": false,
+            "description": "Caption of the post"
+          },
+          {
+            "in": "formData",
+            "name": "imageURL",
+            "type": "file",
+            "required": false,
+            "description": "The file to upload"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Saved draft post object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Post saved as draft"
+                },
+                "post": {
+                  "$ref": "#/definitions/Post"
+                }
+              }
+            }
+          },
+          "301": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/drafts": {
+      "get": {
+        "tags": ["Drafts"],
+        "summary": "Get Drafts",
+        "description": "Get all the posts saved as drafts, by the logged in user",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Array of draft posts objects",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Post"
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/publish/{id}": {
+      "post": {
+        "tags": ["Publish"],
+        "summary": "Publish a drafted post",
+        "description": "Publish a drafted post, based on the post id provided in the path",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Id of the post that needs to be published",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Object containing published post object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Post published"
+                },
+                "post": {
+                  "$ref": "#/definitions/Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/archives": {
+      "get": {
+        "tags": ["Archives"],
+        "summary": "Get Archives",
+        "description": "Get all the posts saved as archive, by the logged in user",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Array of archive posts objects",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Post"
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/arcchive/{id}": {
+      "post": {
+        "tags": ["Archives"],
+        "summary": "Archive a post",
+        "description": "Archive a post, based on the post id provided in the path",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Id of the post that needs to be archived",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Object containing archived post object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Post published"
+                },
+                "post": {
+                  "$ref": "#/definitions/Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/bookmark": {
+      "get": {
+        "tags": ["Bookmarks"],
+        "summary": "Get Bookmarks",
+        "description": "Get all posts bookmarked by a user logged in",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Arrays containing bookmarked post objects",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Post"
+              }
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/bookmark/{id}": {
+      "post": {
+        "tags": ["Bookmarks"],
+        "summary": "Bookmark a post",
+        "description": "Bookmark a particular post based on the postId provided in the path",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Post id, that needs to be bookmarked"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Object containing bookmark model",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "post bookmarked successfully"
+                },
+                "bookmark": {
+                  "$ref": "#/definitions/Bookmark"
+                }
+              }
+            }
+          },
+          "409": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Post already bookmarked"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Bookmarks"],
+        "summary": "Unbookmark a post",
+        "description": "Unbookmark a particular post based on the postId provided in the path",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Post id, that needs to be Unbookmark"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Bookmark removed successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/comments/{id}": {
+      "get": {
+        "tags": ["Comments"],
+        "summary": "Get Comments",
+        "description": "Retrieve all comments on a Post",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Post id, of which comments need to be retrieved"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "description": "Specify the page number",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "description": "Specify the number of comments in one page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "page": {
+                  "type": "integer"
+                },
+                "totalComments": {
+                  "type": "integer"
+                },
+                "totalPages": {
+                  "type": "integer"
+                },
+                "comments": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Comment"
+                  }
+                }
+              }
+            }
+          },
+          "302": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Comments"],
+        "summary": "Post Comment",
+        "description": "Post a comment on a particular post",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Post id, on which comment needs to be posted"
+          },
+          {
+            "in": "body",
+            "name": "comment",
+            "required": true,
+            "description": "Object containing the content of the comment",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "example": "new comment"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Comment Object",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Comment"
+            }
+          },
+          "302": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Comments"],
+        "summary": "Update Comment",
+        "description": "Update a comment on a particular post",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Comment id, which needs to be updated"
+          },
+          {
+            "in": "body",
+            "name": "comment",
+            "required": true,
+            "description": "Object containing the content of the comment",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "example": "updated comment"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment Object",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Comment"
+            }
+          },
+          "302": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Comments"],
+        "summary": "Delete Comment",
+        "description": "Delete a comment on a particular id",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Comment id, which needs to be deleted"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "302": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/likes/{id}": {
+      "get": {
+        "tags": ["Likes"],
+        "summary": "get likes on a post",
+        "description": "get all likes on a particular post, based on the id, provided in the path",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Post id, on which, likes need to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of like objects",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Like"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "302": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    },
+    "/api/likes/toggle/{id}": {
+      "get": {
+        "tags": ["Likes"],
+        "summary": "toggles like on a post",
+        "description": "toggles like on a post, based on the postId, provided in the path",
+        "produces": "application/json",
+        "security": [{ "JWT": {} }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Post id, on which, like needs to be toggled"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
+            "schema": {
+              "$ref": "#/definitions/BadRequestError"
+            }
+          },
+          "401": {
+            "description": "Authorization Error",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationError"
+            }
+          },
+          "404": {
+            "description": "Not Found Error",
+            "schema": {
+              "$ref": "#/definitions/NotFoundError"
+            }
+          },
+          "302": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/InternalServerError"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ValidationError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "example": "field" },
+              "value": { "type": "string", "example": "value" },
+              "msg": {
+                "type": "string",
+                "example": "Password must be at least 8 characters long"
+              },
+              "path": { "type": "string", "example": "password" },
+              "location": { "type": "string", "example": "body" }
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "example": "ValidationError"
+        },
+        "stack": {
+          "type": "string"
+        }
+      }
+    },
+    "NotFoundError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "stack": {
+          "type": "string"
+        }
+      }
+    },
+    "AuthorizationError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "stack": {
+          "type": "string"
+        }
+      }
+    },
+    "InternalServerError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "stack": {
+          "type": "string"
+        }
+      }
+    },
+    "BadRequestError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string",
+          "example": "Id is invalid"
+        },
+        "name": {
+          "type": "string",
+          "example": "Validation Error"
+        },
+        "stack": {
+          "type": "string"
+        }
+      }
+    },
+    "Resource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Shobhit"
+        },
+        "email": {
+          "type": "string",
+          "example": "Shobhitgoyalg@gmail.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "$2b$10$Sx/MgXR0f00c0aOFbWLZce4NrajZM3XMWd8g9.rBg97f57toRL0xu"
+        }
+      }
+    },
+    "Post": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "userId": {
+          "type": "integer"
+        },
+        "caption": {
+          "type": "string"
+        },
+        "imageURL": {
+          "type": "string"
+        },
+        "comments": {
+          "type": "integer"
+        },
+        "likes": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        }
+      }
+    },
+    "Bookmark": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "userId": {
+          "type": "integer"
+        },
+        "postId": {
+          "type": "integer"
+        }
+      }
+    },
+    "Comment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "userId": {
+          "type": "integer"
+        },
+        "postId": {
+          "type": "integer"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "Like": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "userId": {
+          "type": "integer"
+        },
+        "postId": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
