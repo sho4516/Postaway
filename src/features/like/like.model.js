@@ -41,6 +41,7 @@ export default class LikeModel {
         );
       }
     } else {
+      likes.splice(likeIndex, 1);
       cb(null, false);
     }
   }

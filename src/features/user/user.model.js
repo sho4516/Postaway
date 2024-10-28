@@ -37,8 +37,17 @@ export default class UserModel {
     }
     const hashedPassword = user.password;
     const match = await bcrypt.compare(userCreds.password, hashedPassword);
+    const mappedErrorArray = [
+      {
+        type: "field",
+        value: "password",
+        msg: `Incorrect password`,
+        path: "",
+        location: "",
+      },
+    ];
     if (!match) {
-      throw new ValidationError(`Incorrect password`, 404);
+      throw new ValidationError(mappedErrorArray, 422);
     }
     return user;
   }

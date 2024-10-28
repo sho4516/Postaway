@@ -1,8 +1,17 @@
-import ValidationError from "../error-handler/validationError.js";
+import BadRequestError from "../error-handler/badRequestError.js";
 
 export const NumberValidator = (id) => {
   if (isNaN(Number(id))) {
-    throw new ValidationError("Id is invalid", 400);
+    const mappedErrorArray = [
+      {
+        type: "field",
+        value: "id",
+        msg: "Id is invalid",
+        path: "",
+        location: "",
+      },
+    ];
+    throw new BadRequestError(mappedErrorArray, 400);
   }
   return true;
 };

@@ -66,7 +66,7 @@ export default class PostModel {
     const post = posts[postIndex];
 
     if (userId != post.userId) {
-      throw new ValidationError(
+      throw new AuthorizationError(
         `${email} is not authorized to delete this post`,
         401
       );
@@ -80,7 +80,7 @@ export default class PostModel {
     const post = posts[postIndex];
 
     if (userId != post.userId) {
-      throw new ValidationError(
+      throw new AuthorizationError(
         `User is not authorized to update post with id ${postId}`,
         401
       );
@@ -100,11 +100,18 @@ export default class PostModel {
 
   static decrementCommentCount(postId) {
     const postIndex = this._findPostIndex(postId);
+    const mappedErrorArray = [
+      {
+        type: "field",
+        value: "comment",
+        msg: `Comment count is zero and cannot be decremented further`,
+        path: "",
+        location: "",
+      },
+    ];
+
     if (posts[postIndex].comments == 0) {
-      throw new ValidationError(
-        `Comment count is zero and cannot be decremented further`,
-        400
-      );
+      throw new ValidationError(mappedErrorArray, 422);
     }
 
     posts[postIndex].comments -= 1;
@@ -119,11 +126,17 @@ export default class PostModel {
 
   static decrementPostLike(postId) {
     const postIndex = this._findPostIndex(postId);
+    const mappedErrorArray = [
+      {
+        type: "field",
+        value: "like",
+        msg: `Likes count is zero and cannot be decremented further`,
+        path: "",
+        location: "",
+      },
+    ];
     if (posts[postIndex].likes == 0) {
-      throw new ValidationError(
-        `Likes count is zero and cannot be decremented further`,
-        400
-      );
+      throw new ValidationError(mappedErrorArray, 422);
     }
 
     posts[postIndex].likes -= 1;

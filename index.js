@@ -13,6 +13,7 @@ import commentRouter from "./src/features/comment/comment.router.js";
 import jwtValidator from "./src/middlewares/jwt.middleware.js";
 import swagger from "swagger-ui-express";
 import apiDocs from "./swagger.json" assert { type: "json" };
+import BadRequestError from "./src/error-handler/badRequestError.js";
 
 // Initialize express server
 const app = express();
@@ -65,6 +66,14 @@ app.use((err, req, res, next) => {
   }
 
   if (err instanceof AuthorizationError) {
+    return res.status(err.statusCode).json({
+      error: err.message,
+      name: err.name,
+      stack: err.stack,
+    });
+  }
+
+  if (err instanceof BadRequestError) {
     return res.status(err.statusCode).json({
       error: err.message,
       name: err.name,

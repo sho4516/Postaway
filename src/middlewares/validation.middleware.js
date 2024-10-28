@@ -84,15 +84,7 @@ const validateRules = (rules) => {
         path: error.path,
         location: error.location,
       }));
-      //   logger.error({
-      //     message: mappedErrorArray,
-      //     method: req.method,
-      //     url: req.originalUrl,
-      //     status: 302,
-      //     user: req.userId ? req.userId : "Guest",
-      //   });
-
-      return next(new ValidationError(mappedErrorArray, 302));
+      return next(new ValidationError(mappedErrorArray, 422));
     }
     next();
   };
