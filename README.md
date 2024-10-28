@@ -1,16 +1,24 @@
 # PostAway
 
-**PostAway** is a social media platform built with **Node.js** and **Express**, designed for users to post, like, comment, and interact with posts. This project demonstrates how to create a scalable social media application with features for managing posts, likes, comments, and users while implementing authentication and error handling.
+**PostAway** is a social media platform built with **Node.js** and **Express**, designed for users to post, like, comment, and interact with posts. This project demonstrates how to create a scalable social media application with features for managing posts, likes, comments, and users while implementing authentication, error handling, and extended functionalities.
 
 ## Features
 - **User Authentication**: Secure user login and registration using JWT.
 - **Post Management**: Users can create, edit, delete, and view posts.
+  - **Draft and Archive Posts**: Save posts as drafts or publish/archive them for different visibility options.
+- **Filter and Sort Posts**: 
+  - **Filtering**: Users can filter posts based on captions to quickly find relevant content.
+  - **Sorting**: Sort posts by engagement or post date for better organization and visibility.
 - **Commenting System**: Add, edit, and delete comments on posts.
 - **Liking System**: Like and unlike posts.
+- **Bookmarking**: Bookmark and unbookmark posts for easy access later.
+- **Pagination**: Implement pagination for posts and comments to enhance user experience and performance.
 - **Error Handling**: Custom error classes and middleware for clean error messages.
 - **Logging**: Middleware for logging important request data.
 - **In-Memory Data Structures**: For posts, comments, and likes.
 - **Modular Code Architecture**: Clean separation of concerns for scalability.
+- **Swagger Documentation**: Comprehensive API documentation using Swagger 2.0.
+- **Postman Collection**: Ready-to-use Postman collection for testing API endpoints.
 
 ## Technologies and Libraries
 - **Node.js**: Server-side runtime.
@@ -58,6 +66,7 @@ Key dependencies include:
     ```bash
     npm start
     ```
+4. Access Swagger documentation at [http://localhost:3500/api-docs/#/](http://localhost:3500/api-docs/#/) after starting the server.
 
 ## Future Enhancements
 - Persistent database integration (e.g., MongoDB).
